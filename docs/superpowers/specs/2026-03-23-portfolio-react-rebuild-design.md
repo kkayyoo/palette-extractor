@@ -98,6 +98,7 @@ border:       #f0e8e0
 - Section id: `#about`
 - Two-column layout on desktop (text left, optional photo right), single column on mobile
 - Short bio paragraph (carried over from existing site)
+- Photo: hardcoded in `About.tsx` as a static import from `src/assets/images/`; if no photo is provided, the right column is omitted gracefully
 
 ### 3. Portfolio
 - Section id: `#portfolio`
@@ -204,13 +205,18 @@ interface Experience {
   period: string      // e.g. "2016 – 2020"
   description: string
 }
+// experience.ts is scaffolded as an empty array: export const experience: Experience[] = []
+// The Experience section renders gracefully when empty (shows a "coming soon" placeholder message)
 
 interface HobbyBlock {
   title: string
   highlights: string[]
   description: string
-  images: string[]
+  images: string[]    // paths relative to assets/; migrated from old repo images/about/
 }
+// hobbies.ts is pre-populated with text content from the existing site.
+// Image paths are scaffolded as placeholder strings; the actual image files must be
+// manually copied from the old repo's images/about/ directory into src/assets/images/about/.
 ```
 
 ---
@@ -245,7 +251,7 @@ Pre-populate `src/data/projects.ts` with the following records:
 | Musculoskeletal Clinical Regulatory Advisers | Drupal 8 | Main Front-end Developer | — | https://www.mcra.com/ |
 | Zambezi Grace | Shopify | Main Front-end Developer | — | https://zambezigrace.com/ |
 
-Logo images for each project are in the existing repo under `images/logos/`. They should be migrated to `src/assets/images/logos/` in the new repo.
+Logo images for each project are in the existing repo under `images/logos/`. They should be migrated to `src/assets/images/logos/` in the new repo. Filename convention matches the existing filenames (e.g. `fage.svg`, `bd.jpg`, `valley.png` — see the old repo for the exact filenames). The `logo` field in each `Project` record should be the filename only (e.g. `"fage.svg"`), and the component resolves the full path.
 
 `hobbies.ts` images depend on migrating assets from the old repo (`images/about/`); scaffold with placeholder image paths and note that assets must be copied manually.
 
