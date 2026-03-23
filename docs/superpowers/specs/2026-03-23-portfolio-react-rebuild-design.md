@@ -77,8 +77,9 @@ border:       #f0e8e0
 
 - **Structure:** Single-page application, all sections on one scrollable page
 - **Nav:** Sticky top navbar — logo (`Kay.Yo`) left, anchor links right
-  - Links: Portfolio · Skills · About · Contact · Resume
-  - Resume opens a PDF in a new tab
+  - Links (in page order): About · Portfolio · Skills · Experience · Contact · Resume
+  - `Beyond Work` section is intentionally omitted from the navbar (no direct anchor link; reached by scrolling)
+  - Resume opens a PDF in a new tab; PDF file placed in `public/resume.pdf` (user provides the file)
   - Active section highlighted via `IntersectionObserver`
 - **Mobile:** Hamburger icon toggles a nav drawer
 - **Scroll:** Native CSS `scroll-behavior: smooth`
@@ -94,6 +95,7 @@ border:       #f0e8e0
 - Background: `#fdf6ee`, CTA button in terracotta accent
 
 ### 2. About
+- Section id: `#about`
 - Two-column layout on desktop (text left, optional photo right), single column on mobile
 - Short bio paragraph (carried over from existing site)
 
@@ -112,12 +114,13 @@ border:       #f0e8e0
 - Data source: `src/data/skills.ts`
 
 ### 5. Experience / Timeline
-- Section id: `#about` (shared with About or adjacent)
+- Section id: `#experience`
 - Vertical timeline layout
 - Each entry: company, role, date range, brief description
 - Data source: `src/data/experience.ts` (user fills in details)
 
 ### 6. Beyond Work (Hobbies)
+- Section id: `#hobbies` (not linked in the navbar — reached by scrolling only)
 - Three content blocks: Hackathons, Volunteering, Running & Travel
 - Each block: title, highlights, description, images
 - Images migrated from existing repo
@@ -125,8 +128,11 @@ border:       #f0e8e0
 
 ### 7. Contact
 - Section id: `#contact`
-- Four icon cards: Email, GitHub, CodePen, LinkedIn
-- Same links as existing site
+- Four icon cards with the following links:
+  - Email: `kayqiu87@gmail.com`
+  - GitHub: `https://github.com/kkayyoo`
+  - CodePen: `http://codepen.io/KayYo`
+  - LinkedIn: `https://www.linkedin.com/in/yaqiqiu`
 
 ### 8. Footer
 - Minimal: "Thank you for visiting!" with smile icon
@@ -179,7 +185,7 @@ Defined in `src/types/index.ts`:
 
 ```ts
 interface Project {
-  name: string
+  name: string        // client/project name, e.g. "Fage"
   logo: string        // path relative to assets/
   platform: string    // e.g. "Drupal 8", "Shopify"
   role: string        // e.g. "Front-end Lead"
@@ -213,10 +219,35 @@ interface HobbyBlock {
 
 | File | Content |
 |------|---------|
-| `src/data/projects.ts` | All 12 client projects pre-populated from existing site |
+| `src/data/projects.ts` | All 12 client projects pre-populated (source: `kkayyoo.github.io` index.html — data listed below) |
 | `src/data/skills.ts` | 8 skills with devicon class names |
-| `src/data/experience.ts` | Work history (user fills in details) |
+| `src/data/experience.ts` | Work history — scaffolded as an empty typed array with a comment; user populates content separately |
 | `src/data/hobbies.ts` | 3 hobby blocks from existing site |
+
+---
+
+## Project Data (12 Client Projects)
+
+Pre-populate `src/data/projects.ts` with the following records:
+
+| name | platform | role | award | url |
+|------|----------|------|-------|-----|
+| Fage | Drupal 8 | Front-end Lead | — | https://usa.fage/ |
+| Boston Digital | Drupal 8 – website redesign | Main Front-end Developer | — | https://www.bostoninteractive.com/ |
+| Valley | — | Front-end Lead | Gold MarCom Award | https://www.valley.com/ |
+| Cambridge Trust | Kentico | Main Front-end Developer | Kentico Top 10 Websites Oct 2018 | https://www.cambridgetrust.com/ |
+| Allways Health Partners | Kentico | Front-end Lead | — | https://www.allwayshealthpartners.org/ |
+| The Guild for Human Services | — | Front-end Lead | AAA compliant website | https://www.guildhumanservices.org/ |
+| L.E.K Consulting | — | Front-end Developer | Consulting Standard of Excellence (WebAwards) | https://www.lek.com/ |
+| Charles River Labs | — | Front-end Developer | Outstanding Website (WebAwards) | https://www.criver.com/ |
+| The Andover Companies | Drupal 8 | Front-end Developer | — | https://www.andovercompanies.com/ |
+| Reputation Institute | Drupal 8 | Main Front-end Developer | — | https://www.reputationinstitute.com/ |
+| Musculoskeletal Clinical Regulatory Advisers | Drupal 8 | Main Front-end Developer | — | https://www.mcra.com/ |
+| Zambezi Grace | Shopify | Main Front-end Developer | — | https://zambezigrace.com/ |
+
+Logo images for each project are in the existing repo under `images/logos/`. They should be migrated to `src/assets/images/logos/` in the new repo.
+
+`hobbies.ts` images depend on migrating assets from the old repo (`images/about/`); scaffold with placeholder image paths and note that assets must be copied manually.
 
 ---
 
