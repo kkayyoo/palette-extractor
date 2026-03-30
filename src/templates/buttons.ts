@@ -1,12 +1,12 @@
 // src/templates/buttons.ts
 import type { PaletteColor, DesignFormat } from '../types'
-import type { CustomizationOptions, TemplateResult, TemplateSpec } from './types'
+import type { AnimationSpeed, CustomizationOptions, TemplateResult, TemplateSpec } from './types'
 
 function getColor(colors: PaletteColor[], role: string, fallback = '#888'): string {
   return colors.find(c => c.role === role)?.hex ?? fallback
 }
 
-function speedMs(speed: 'slow' | 'default' | 'fast'): string {
+function speedMs(speed: AnimationSpeed): string {
   return speed === 'slow' ? '0.5s' : speed === 'fast' ? '0.15s' : '0.25s'
 }
 
@@ -33,8 +33,12 @@ function generatePrimaryButton(
   const br = borderRadius(format)
   const shadow = shadowStyle(format, primary)
 
+  // TODO: use animationIntensity in future tasks
+  const bgValue = format === 'glassmorphism' ? `${primary}99` : primary
+  const backdropFilter = format === 'glassmorphism' ? '\n  backdrop-filter: blur(10px);' : ''
+
   const css = `.btn-primary {
-  background: ${primary};
+  background: ${bgValue};
   color: ${bg};
   border: ${format === 'brutalist' ? `3px solid ${primary}` : 'none'};
   border-radius: ${br};
@@ -42,8 +46,7 @@ function generatePrimaryButton(
   font-size: 1rem;
   cursor: pointer;
   box-shadow: ${shadow};
-  transition: transform ${dur} ease, box-shadow ${dur} ease, opacity ${dur} ease;
-  ${format === 'glassmorphism' ? 'backdrop-filter: blur(10px); background: ' + primary + '99;' : ''}
+  transition: transform ${dur} ease, box-shadow ${dur} ease, opacity ${dur} ease;${backdropFilter}
 }
 .btn-primary:hover {
   transform: scale(${options.animationStyle === 'hover-scale' ? '1.05' : '1'});
