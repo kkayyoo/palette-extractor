@@ -8,7 +8,6 @@ export function Canvas() {
       {/* Views will be wired in subsequent tasks */}
       <div className="text-neutral-500 text-center mt-20">
         View: <strong>{state.view}</strong>
-        {state.activeProjectId && <p className="text-xs mt-2">Project: {state.activeProjectId}</p>}
       </div>
     </main>
   )

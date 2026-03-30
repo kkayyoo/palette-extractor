@@ -12,7 +12,7 @@ const TABS: { label: string; view: AppView }[] = [
 export function Toolbar() {
   const { state, setView } = useApp()
   return (
-    <header className="h-12 bg-neutral-900 border-b border-neutral-800 flex items-center px-4 gap-2">
+    <header aria-label="View navigation" className="h-12 bg-neutral-900 border-b border-neutral-800 flex items-center px-4 gap-2">
       {TABS.map(({ label, view }) => (
         <button
           key={view}

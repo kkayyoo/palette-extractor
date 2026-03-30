@@ -27,6 +27,7 @@ export function Sidebar() {
       <div className="p-4">
         <button
           onClick={handleNew}
+          aria-label="New project"
           className="w-full bg-indigo-600 hover:bg-indigo-500 text-white rounded px-3 py-2 text-sm font-medium"
         >
           + New
@@ -41,7 +42,7 @@ export function Sidebar() {
               onClick={() => { setActiveProject(p.id); setView('palette') }}
               className={`w-full text-left px-3 py-2 rounded text-sm hover:bg-neutral-800 ${state.activeProjectId === p.id ? 'bg-neutral-800' : ''}`}
             >
-              🎨 {p.name}
+              <span aria-hidden="true">🎨</span> {p.name}
             </button>
           </li>
         ))}
@@ -49,21 +50,23 @@ export function Sidebar() {
       </ul>
 
       <div className="px-4 text-xs uppercase text-neutral-500 tracking-widest mb-1 mt-2">Templates</div>
-      <ul className="px-2 mb-4">
+      <ul className="px-2 mb-4 max-h-40 overflow-y-auto">
         {templates.map(p => (
           <li key={p.id}>
             <button
               onClick={() => { setActiveProject(p.id); setView('template') }}
               className={`w-full text-left px-3 py-2 rounded text-sm hover:bg-neutral-800 ${state.activeProjectId === p.id ? 'bg-neutral-800' : ''}`}
             >
-              📄 {p.name}
+              <span aria-hidden="true">📄</span> {p.name}
             </button>
           </li>
         ))}
         {templates.length === 0 && <li className="px-3 py-2 text-xs text-neutral-600">None yet</li>}
       </ul>
 
-      <div className="border-t border-neutral-800 p-4 text-xs text-neutral-500">⚙ Settings</div>
+      <button className="border-t border-neutral-800 p-4 text-xs text-neutral-500 text-left w-full">
+        <span aria-hidden="true">⚙</span> Settings
+      </button>
     </aside>
   )
 }
