@@ -8,9 +8,14 @@ export type ContentFormat =
   | 'website' | 'mobile-app' | 'dashboard' | 'landing-page'
   | 'poster' | 'social-media' | 'presentation' | 'ecommerce';
 
+/** A CSS hex color string, e.g. "#ff5500" or "#fff" */
+export type HexColor = `#${string}`;
+
 export interface PaletteColor {
-  hex: string;
-  role: string; // 'primary' | 'secondary' | 'accent' | 'background' | 'text' | etc.
+  /** Hex color value, e.g. "#ff5500" */
+  hex: HexColor;
+  /** Known values: 'primary' | 'secondary' | 'accent' | 'background' | 'text'. Extra colors get 'extra-N'. */
+  role: string;
 }
 
 export interface SuggestedStyles {
@@ -22,7 +27,11 @@ export interface SuggestedStyles {
 export interface ExtractedPalette {
   id: string;
   name: string;
-  source: { type: 'image' | 'url'; thumbnail: string };
+  source: {
+    type: 'image' | 'url';
+    /** Data URL (from canvas.toDataURL) for images, or the original URL string for URL sources */
+    thumbnail: string;
+  };
   colors: PaletteColor[];
   keywords: string[];
   mood: string;
