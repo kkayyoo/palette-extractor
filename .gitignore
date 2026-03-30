@@ -26,3 +26,6 @@ dist-ssr
 # Tooling artifacts
 .server-out.txt
 .superpowers/
+
+# Windows reserved device name (created by some tools on Windows)
+nul
