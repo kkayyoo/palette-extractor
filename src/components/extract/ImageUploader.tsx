@@ -3,7 +3,7 @@ import { useRef, type DragEvent } from 'react'
 import type { PaletteColor } from '../../types'
 
 interface Props {
-  onExtract: (colors: PaletteColor[], thumbnail: string) => void
+  onExtract?: (colors: PaletteColor[], thumbnail: string) => void
   isLoading?: boolean
   error?: string | null
   onFileSelected: (file: File) => void

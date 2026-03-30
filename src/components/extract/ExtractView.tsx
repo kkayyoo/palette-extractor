@@ -6,7 +6,7 @@ import { DesignFormatPicker } from './DesignFormatPicker'
 import { useColorExtraction } from '../../hooks/useColorExtraction'
 import { useAIAnalysis } from '../../hooks/useAIAnalysis'
 import { useApp } from '../../context/AppContext'
-import type { ContentFormat, DesignFormat, ExtractedPalette } from '../../types'
+import type { ContentFormat, DesignFormat, ExtractedPalette, HexColor, PaletteColor } from '../../types'
 
 const CONTENT_FORMATS: ContentFormat[] = [
   'website', 'mobile-app', 'dashboard', 'landing-page',
@@ -21,6 +21,7 @@ export function ExtractView() {
   const [apiKey, setApiKey] = useState(() => localStorage.getItem('openai-api-key') ?? '')
   const [selectedFormat, setSelectedFormat] = useState<DesignFormat>('minimalist')
   const [contentFormat, setContentFormat] = useState<ContentFormat>('website')
+  const [urlColors, setUrlColors] = useState<PaletteColor[]>([])
   const [isUrlLoading, setIsUrlLoading] = useState(false)
   const [urlError, setUrlError] = useState<string | null>(null)
 
@@ -43,6 +44,10 @@ export function ExtractView() {
       const data = await res.json()
       // data.colors is string[] of hex from CSS; convert to PaletteColor[]
       const hexColors: string[] = data.colors.slice(0, 8)
+      const paletteColors: PaletteColor[] = hexColors
+        .filter((h): h is HexColor => /^#[0-9a-fA-F]{3,8}$/.test(h))
+        .map((hex, i) => ({ hex, role: i === 0 ? 'primary' : i === 1 ? 'secondary' : 'accent' as const }))
+      setUrlColors(paletteColors)
       // Capture return value directly to avoid stale state reads
       const analysisResult = await ai.analyze(hexColors, null, apiKey)
       if (analysisResult) setSelectedFormat(analysisResult.suggestedDesignFormats[0])
@@ -54,12 +59,13 @@ export function ExtractView() {
   }
 
   function handleSave() {
-    if (!ai.result || extraction.colors.length === 0) return
+    const colors = tab === 'image' ? extraction.colors : urlColors
+    if (!ai.result || colors.length === 0) return
     const palette: ExtractedPalette = {
       id: crypto.randomUUID(),
       name: `Palette ${new Date().toLocaleDateString()}`,
-      source: { type: tab, thumbnail: extraction.thumbnail },
-      colors: extraction.colors,
+      source: { type: tab, thumbnail: tab === 'image' ? extraction.thumbnail : '' },
+      colors,
       keywords: ai.result.keywords,
       mood: ai.result.mood,
       suggestedDesignFormats: ai.result.suggestedDesignFormats,
@@ -81,8 +87,8 @@ export function ExtractView() {
     setView('palette')
   }
 
-  const hasPalette = extraction.colors.length > 0
-  const hasAnalysis = !!ai.result
+  const hasPalette = (tab === 'image' ? extraction.colors : urlColors).length > 0
+  const displayColors = tab === 'image' ? extraction.colors : urlColors
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -94,7 +100,12 @@ export function ExtractView() {
         <input
           type="password"
           value={apiKey}
-          onChange={e => { setApiKey(e.target.value); localStorage.setItem('openai-api-key', e.target.value) }}
+          onChange={e => {
+            setApiKey(e.target.value)
+            // Note: stored in localStorage for persistence across sessions.
+            // Users should use a key with minimal permissions and understand the trade-off.
+            localStorage.setItem('openai-api-key', e.target.value)
+          }}
           placeholder="sk-..."
           className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-neutral-100 text-sm focus:outline-none focus:border-indigo-500"
         />
@@ -115,7 +126,6 @@ export function ExtractView() {
 
       {tab === 'image' ? (
         <ImageUploader
-          onExtract={() => {}}
           isLoading={extraction.isLoading}
           error={extraction.error}
           onFileSelected={handleFileSelected}
@@ -133,8 +143,8 @@ export function ExtractView() {
         <div className="mt-6 space-y-4">
           {/* Color swatches */}
           <div className="flex gap-2 flex-wrap">
-            {extraction.colors.map((c, i) => (
-              <div key={i} className="flex flex-col items-center gap-1">
+            {displayColors.map((c) => (
+              <div key={c.hex} className="flex flex-col items-center gap-1">
                 <div className="w-12 h-12 rounded-lg border border-neutral-700" style={{ background: c.hex }} />
                 <span className="text-xs text-neutral-500">{c.hex}</span>
                 <span className="text-xs text-neutral-600">{c.role}</span>
@@ -143,24 +153,25 @@ export function ExtractView() {
           </div>
 
           {/* AI results */}
-          {hasAnalysis && (
+          {ai.result && (
             <>
               <div className="flex gap-2 flex-wrap">
-                {ai.result!.keywords.map(k => (
+                {ai.result.keywords.map(k => (
                   <span key={k} className="bg-neutral-800 text-neutral-300 rounded-full px-3 py-0.5 text-xs">{k}</span>
                 ))}
-                <span className="bg-indigo-900 text-indigo-300 rounded-full px-3 py-0.5 text-xs">mood: {ai.result!.mood}</span>
+                <span className="bg-indigo-900 text-indigo-300 rounded-full px-3 py-0.5 text-xs">mood: {ai.result.mood}</span>
               </div>
 
               <DesignFormatPicker
-                suggestions={ai.result!.suggestedDesignFormats}
+                suggestions={ai.result.suggestedDesignFormats}
                 selected={selectedFormat}
                 onChange={setSelectedFormat}
               />
 
               <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium text-neutral-300">Content Format</label>
+                <label htmlFor="content-format" className="text-sm font-medium text-neutral-300">Content Format</label>
                 <select
+                  id="content-format"
                   value={contentFormat}
                   onChange={e => setContentFormat(e.target.value as ContentFormat)}
                   className="bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-neutral-100 focus:outline-none focus:border-indigo-500"
