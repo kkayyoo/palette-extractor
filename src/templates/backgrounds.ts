@@ -80,7 +80,7 @@ function generateParticleBackground(
   width: 80px; height: 80px;
   background: ${accent}55;
   top: 50%; left: 65%;
-  animation-delay: -${parseFloat(speed) / 2}s;
+  animation-delay: -${(parseFloat(speed) / 2).toFixed(2)}s;
 }`
 
   return { html: '<div class="bg-particle"></div>', css }
@@ -89,44 +89,35 @@ function generateParticleBackground(
 function generateWaveBackground(
   colors: PaletteColor[], _format: DesignFormat, options: CustomizationOptions
 ): TemplateResult {
-  const bg = getColor(colors, 'background')
   const primary = getColor(colors, 'primary')
   const secondary = getColor(colors, 'secondary')
-  const speed = options.animationSpeed === 'slow' ? '10s' : options.animationSpeed === 'fast' ? '4s' : '7s'
+  const speed = options.animationSpeed === 'slow' ? '8s' : options.animationSpeed === 'fast' ? '3s' : '5s'
 
-  const css = `@keyframes waveMove {
-  0%   { d: path("M0,100 C150,0 350,200 500,100 L500,200 L0,200 Z"); }
-  50%  { d: path("M0,100 C200,200 300,0 500,100 L500,200 L0,200 Z"); }
-  100% { d: path("M0,100 C150,0 350,200 500,100 L500,200 L0,200 Z"); }
+  const css = `@keyframes waveDrift {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
 }
 .bg-wave {
-  background: ${bg};
-  min-height: 200px;
   position: relative;
+  min-height: 200px;
   overflow: hidden;
+  background: ${primary}22;
 }
-.bg-wave__svg {
+.bg-wave svg {
   position: absolute;
   bottom: 0;
   left: 0;
-  width: 100%;
-  height: 60%;
+  width: 200%;
+  animation: waveDrift ${speed} linear infinite;
 }
-.bg-wave__path1 {
-  fill: ${primary}99;
-  animation: waveMove ${speed} ease-in-out infinite;
-}
-.bg-wave__path2 {
-  fill: ${secondary}66;
-  animation: waveMove ${speed} ease-in-out infinite reverse;
-  animation-delay: -${parseFloat(speed) / 3}s;
+.bg-wave svg.bg-wave-back {
+  animation-duration: ${(parseFloat(speed) * 1.5).toFixed(2)}s;
+  opacity: 0.5;
 }`
 
   const html = `<div class="bg-wave">
-  <svg class="bg-wave__svg" viewBox="0 0 500 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-    <path class="bg-wave__path2" d="M0,120 C180,20 320,200 500,120 L500,200 L0,200 Z"/>
-    <path class="bg-wave__path1" d="M0,100 C150,0 350,200 500,100 L500,200 L0,200 Z"/>
-  </svg>
+  <svg class="bg-wave-back" viewBox="0 0 400 60" preserveAspectRatio="none" fill="${secondary}" opacity="0.4"><path d="M0,30 C100,60 200,0 400,30 L400,60 L0,60 Z"/></svg>
+  <svg viewBox="0 0 400 60" preserveAspectRatio="none" fill="${primary}"><path d="M0,30 C100,0 200,60 400,30 L400,60 L0,60 Z"/></svg>
 </div>`
   return { html, css }
 }
@@ -167,7 +158,7 @@ function generateMorphingBlob(
   width: 120px;
   height: 120px;
   background: linear-gradient(135deg, ${accent}, ${primary});
-  animation-delay: -${parseFloat(speed) / 2}s;
+  animation-delay: -${(parseFloat(speed) / 2).toFixed(2)}s;
   top: 20%;
   right: 15%;
   opacity: 0.4;
@@ -221,7 +212,7 @@ function generateAuroraBackground(
               radial-gradient(ellipse at 30% 20%, ${primary}33 0%, transparent 55%);
   filter: blur(40px);
   animation: aurora2 ${speed} ease-in-out infinite;
-  animation-delay: -${parseFloat(speed) / 3}s;
+  animation-delay: -${(parseFloat(speed) / 3).toFixed(2)}s;
 }`
 
   const html = `<div class="bg-aurora">

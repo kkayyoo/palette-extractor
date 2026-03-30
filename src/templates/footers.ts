@@ -6,21 +6,21 @@ import { getColor, borderRadius, speedMs } from './utils'
 function generateSimpleFooter(
   colors: PaletteColor[], format: DesignFormat, options: CustomizationOptions
 ): TemplateResult {
-  const bg = getColor(colors, 'text')      // footer uses text color as its bg for contrast
-  const text = getColor(colors, 'background')
+  const footerBg = getColor(colors, 'text')      // footer uses text color as its bg for contrast
+  const footerText = getColor(colors, 'background')
   const primary = getColor(colors, 'primary')
   const dur = speedMs(options.animationSpeed)
 
-  const footerBg = format === 'glassmorphism'
+  const resolvedFooterBg = format === 'glassmorphism'
     ? `rgba(0,0,0,0.6)`
     : format === 'brutalist'
     ? primary
-    : bg
+    : footerBg
 
   const css = `.footer-simple {
-  background: ${footerBg};
+  background: ${resolvedFooterBg};
   ${format === 'glassmorphism' ? 'backdrop-filter: blur(12px);' : ''}
-  color: ${text};
+  color: ${footerText};
   padding: 2rem;
   text-align: center;
   border-top: ${format === 'brutalist' ? `4px solid #fff` : `1px solid ${primary}44`};
@@ -61,19 +61,19 @@ function generateSimpleFooter(
 function generateMultiColumnFooter(
   colors: PaletteColor[], format: DesignFormat, options: CustomizationOptions
 ): TemplateResult {
-  const bg = getColor(colors, 'text')
-  const text = getColor(colors, 'background')
+  const footerBg = getColor(colors, 'text')
+  const footerText = getColor(colors, 'background')
   const primary = getColor(colors, 'primary')
   const accent = getColor(colors, 'accent')
   const br = borderRadius(format)
   const dur = speedMs(options.animationSpeed)
 
-  const footerBg = format === 'glassmorphism' ? `rgba(0,0,0,0.7)` : bg
+  const resolvedFooterBg = format === 'glassmorphism' ? `rgba(0,0,0,0.7)` : footerBg
 
   const css = `.footer-multi {
-  background: ${footerBg};
+  background: ${resolvedFooterBg};
   ${format === 'glassmorphism' ? 'backdrop-filter: blur(16px);' : ''}
-  color: ${text};
+  color: ${footerText};
   padding: 3rem 2rem 1.5rem;
   border-top: ${format === 'brutalist' ? `4px solid ${primary}` : `1px solid ${primary}33`};
 }
@@ -113,7 +113,7 @@ function generateMultiColumnFooter(
   gap: .4rem;
 }
 .footer-multi__links a {
-  color: ${text};
+  color: ${footerText};
   opacity: .7;
   text-decoration: none;
   font-size: .875rem;
@@ -121,7 +121,7 @@ function generateMultiColumnFooter(
 }
 .footer-multi__links a:hover { opacity: 1; color: ${primary}; }
 .footer-multi__bottom {
-  border-top: 1px solid ${text}22;
+  border-top: 1px solid ${footerText}22;
   padding-top: 1.5rem;
   text-align: center;
   font-size: .8rem;

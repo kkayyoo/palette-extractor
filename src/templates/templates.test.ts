@@ -36,3 +36,20 @@ for (const { name, templates, minCount } of allGroups) {
     }
   })
 }
+
+it('animated hero CSS includes keyframe animation', () => {
+  const animated = heroTemplates.find(t => t.id.includes('animated'))!
+  const result = animated.generate(colors, 'flat', opts)
+  expect(result.css).toMatch(/@keyframes/i)
+})
+
+it('primary palette color appears in card CSS output', () => {
+  const result = cardTemplates[1].generate(colors, 'flat', opts)
+  expect(result.css).toMatch(/#6c63ff/i)
+})
+
+it('animated gradient background CSS includes keyframe animation', () => {
+  const animated = backgroundTemplates.find(t => t.id.includes('animated'))!
+  const result = animated.generate(colors, 'flat', opts)
+  expect(result.css).toMatch(/@keyframes/i)
+})
