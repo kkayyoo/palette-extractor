@@ -24,8 +24,11 @@ export function ImageUploader({ onExtract: _onExtract, isLoading, error, onFileS
 
   return (
     <div
+      role="button"
+      tabIndex={0}
       onDrop={handleDrop}
       onDragOver={e => e.preventDefault()}
+      onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && inputRef.current?.click()}
       className="border-2 border-dashed border-neutral-700 rounded-xl p-12 text-center cursor-pointer hover:border-indigo-500 transition-colors"
       onClick={() => inputRef.current?.click()}
     >
