@@ -7,7 +7,13 @@ const PRIVATE_IP_PATTERNS = [
   /^192\.168\./,
   /^172\.(1[6-9]|2\d|3[0-1])\./,
   /^127\./,
+  /^0\.0\.0\.0$/,
+  /^169\.254\./,          // Cloud metadata (AWS/GCP/Azure IMDS)
   /^::1$/,
+  /^::ffff:127\./,        // IPv4-mapped loopback
+  /^fe80:/i,              // IPv6 link-local
+  /^fc00:/i,              // IPv6 unique local
+  /^fd[0-9a-f]{2}:/i,    // IPv6 unique local (fd00::/8)
   /^localhost$/i,
 ]
 
@@ -15,13 +21,19 @@ function isPrivate(hostname: string): boolean {
   return PRIVATE_IP_PATTERNS.some(p => p.test(hostname))
 }
 
-// Simple rate-limit store (resets on cold start — acceptable for MVP)
+// NOTE: This in-memory rate limit is a best-effort courtesy limit, not a security control.
+// It resets on cold start and is not shared across Vercel instances.
+// For production, use Vercel's edge rate limiting or an external KV store.
 const rateMap = new Map<string, { count: number; reset: number }>()
 const RATE_LIMIT = 10
 const WINDOW_MS = 60_000
 
 function checkRateLimit(ip: string): boolean {
   const now = Date.now()
+  // Prune stale entries to prevent unbounded memory growth
+  for (const [key, entry] of rateMap) {
+    if (now > entry.reset) rateMap.delete(key)
+  }
   const entry = rateMap.get(ip)
   if (!entry || now > entry.reset) {
     rateMap.set(ip, { count: 1, reset: now + WINDOW_MS })
@@ -69,6 +81,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const location = response.headers.get('location')
         if (!location) break
         const next = new URL(location, targetUrl)
+        if (!['http:', 'https:'].includes(next.protocol))
+          return res.status(400).json({ error: 'Redirect to non-HTTP protocol blocked' })
         if (isPrivate(next.hostname)) return res.status(400).json({ error: 'Redirect to private IP blocked' })
         targetUrl = next.toString()
         redirectCount++
@@ -77,13 +91,32 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       break
     }
 
-    const contentLength = parseInt(response!.headers.get('content-length') ?? '0')
-    if (contentLength > 5 * 1024 * 1024)
-      return res.status(413).json({ error: 'Response too large' })
+    const MAX_BYTES = 5 * 1024 * 1024 // 5MB
+    const reader = (response!.body as ReadableStream<Uint8Array> | null)?.getReader()
+    if (!reader) return res.status(502).json({ error: 'No response body' })
 
-    const text = await response!.text()
-    if (text.length > 5 * 1024 * 1024)
-      return res.status(413).json({ error: 'Response too large' })
+    const chunks: Uint8Array[] = []
+    let totalBytes = 0
+
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+      totalBytes += value.length
+      if (totalBytes > MAX_BYTES) {
+        reader.cancel()
+        return res.status(413).json({ error: 'Response too large' })
+      }
+      chunks.push(value)
+    }
+
+    const text = new TextDecoder().decode(
+      chunks.reduce((acc, chunk) => {
+        const merged = new Uint8Array(acc.length + chunk.length)
+        merged.set(acc)
+        merged.set(chunk, acc.length)
+        return merged
+      }, new Uint8Array(0))
+    )
 
     // Extract CSS colors and stylesheet hrefs
     const colors = extractCssColors(text)
