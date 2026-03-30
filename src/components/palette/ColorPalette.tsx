@@ -6,8 +6,8 @@ interface Props { colors: PaletteColor[] }
 export function ColorPalette({ colors }: Props) {
   return (
     <ul className="flex gap-3 flex-wrap" role="list">
-      {colors.map((c, i) => (
-        <li key={i} className="flex flex-col items-center gap-1">
+      {colors.map((c) => (
+        <li key={c.hex} className="flex flex-col items-center gap-1">
           <div
             className="w-16 h-16 rounded-xl border border-neutral-700 shadow-inner"
             style={{ background: c.hex }}
