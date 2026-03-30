@@ -1,0 +1,104 @@
+<h2>App Layout Options</h2>
+<p class="subtitle">Choose a layout structure for the application</p>
+
+<div class="cards">
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 1rem; background: var(--bg-secondary);">
+      <div style="display: flex; height: 200px; gap: 2px; background: var(--border-color); border-radius: 8px; overflow: hidden;">
+        <!-- Left sidebar -->
+        <div style="width: 60px; background: #1e293b; display: flex; flex-direction: column; align-items: center; padding-top: 1rem; gap: 1rem;">
+          <div style="width: 32px; height: 32px; background: #3b82f6; border-radius: 8px;"></div>
+          <div style="width: 32px; height: 32px; background: #334155; border-radius: 8px;"></div>
+          <div style="width: 32px; height: 32px; background: #334155; border-radius: 8px;"></div>
+          <div style="width: 32px; height: 32px; background: #334155; border-radius: 8px;"></div>
+          <div style="width: 32px; height: 32px; background: #334155; border-radius: 8px;"></div>
+        </div>
+        <!-- Main canvas -->
+        <div style="flex: 1; background: #0f172a; display: flex; align-items: center; justify-content: center;">
+          <div style="color: #64748b; font-size: 0.75rem;">Main Canvas</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Icon Sidebar</h3>
+      <p>Narrow icon-only sidebar (like Figma, VS Code). Maximizes canvas space. Tooltips on hover.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 1rem; background: var(--bg-secondary);">
+      <div style="display: flex; height: 200px; gap: 2px; background: var(--border-color); border-radius: 8px; overflow: hidden;">
+        <!-- Left sidebar with labels -->
+        <div style="width: 180px; background: #1e293b; padding: 1rem;">
+          <div style="color: #94a3b8; font-size: 0.65rem; margin-bottom: 0.75rem;">WORKSPACE</div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; background: #3b82f6; border-radius: 6px; margin-bottom: 0.5rem;">
+            <div style="width: 16px; height: 16px; background: white; border-radius: 4px;"></div>
+            <span style="color: white; font-size: 0.65rem;">Extract</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem;">
+            <div style="width: 16px; height: 16px; background: #475569; border-radius: 4px;"></div>
+            <span style="color: #94a3b8; font-size: 0.65rem;">Palette</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem;">
+            <div style="width: 16px; height: 16px; background: #475569; border-radius: 4px;"></div>
+            <span style="color: #94a3b8; font-size: 0.65rem;">Templates</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem;">
+            <div style="width: 16px; height: 16px; background: #475569; border-radius: 4px;"></div>
+            <span style="color: #94a3b8; font-size: 0.65rem;">Export</span>
+          </div>
+        </div>
+        <!-- Main canvas -->
+        <div style="flex: 1; background: #0f172a; display: flex; align-items: center; justify-content: center;">
+          <div style="color: #64748b; font-size: 0.75rem;">Main Canvas</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Labeled Sidebar</h3>
+      <p>Wider sidebar with icons + labels. Clearer navigation, good for first-time users. Standard app layout.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 1rem; background: var(--bg-secondary);">
+      <div style="display: flex; height: 200px; gap: 2px; background: var(--border-color); border-radius: 8px; overflow: hidden;">
+        <!-- Left sidebar -->
+        <div style="width: 200px; background: #1e293b; padding: 1rem;">
+          <div style="color: #94a3b8; font-size: 0.65rem; margin-bottom: 0.75rem;">STEPS</div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; background: #3b82f6; border-radius: 6px; margin-bottom: 0.5rem;">
+            <span style="color: white; font-size: 0.65rem;">1. Extract</span>
+          </div>
+          <div style="padding: 0.5rem;"><span style="color: #64748b; font-size: 0.65rem;">2. Palette</span></div>
+          <div style="padding: 0.5rem;"><span style="color: #64748b; font-size: 0.65rem;">3. Templates</span></div>
+          <div style="padding: 0.5rem;"><span style="color: #64748b; font-size: 0.65rem;">4. Export</span></div>
+        </div>
+        <!-- Main canvas -->
+        <div style="flex: 1; background: #0f172a; display: flex; align-items: center; justify-content: center;">
+          <div style="color: #64748b; font-size: 0.75rem;">Main Canvas</div>
+        </div>
+        <!-- Right panel -->
+        <div style="width: 220px; background: #1e293b; padding: 1rem;">
+          <div style="color: #94a3b8; font-size: 0.65rem; margin-bottom: 0.75rem;">PROPERTIES</div>
+          <div style="background: #334155; height: 24px; border-radius: 4px; margin-bottom: 0.5rem;"></div>
+          <div style="background: #334155; height: 24px; border-radius: 4px; margin-bottom: 0.5rem;"></div>
+          <div style="background: #334155; height: 24px; border-radius: 4px;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Three-Panel (Recommended)</h3>
+      <p>Left nav + main canvas + right properties panel. Like Figma/design tools. Context-aware right panel shows relevant controls.</p>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 1.5rem; padding: 1rem; background: var(--bg-secondary); border-radius: 8px;">
+  <p><strong>Recommendation:</strong> Option C (Three-Panel) works best for this tool. The right panel can show:</p>
+  <ul style="margin: 0.5rem 0 0 1.5rem; color: var(--text-secondary);">
+    <li><strong>Extract step:</strong> Source preview, analysis status</li>
+    <li><strong>Palette step:</strong> Color editor, keyword toggles</li>
+    <li><strong>Templates step:</strong> Style presets, manual controls</li>
+    <li><strong>Export step:</strong> Format options, copy buttons</li>
+  </ul>
+</div>

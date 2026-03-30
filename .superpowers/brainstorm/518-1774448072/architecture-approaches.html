@@ -1,0 +1,87 @@
+<h2>Architecture Approaches</h2>
+<p class="subtitle">How should we structure the application?</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Single-Page App (Recommended)</h3>
+      <p>React SPA with client-side color extraction. All processing happens in browser using Canvas API for images and a CORS proxy for CSS fetching.</p>
+      <div class="pros-cons">
+        <div class="pros">
+          <h4>Pros</h4>
+          <ul>
+            <li>No backend needed initially</li>
+            <li>Fast iteration, simpler deployment</li>
+            <li>Easy to add backend later</li>
+            <li>Free hosting (Vercel, Netlify)</li>
+          </ul>
+        </div>
+        <div class="cons">
+          <h4>Cons</h4>
+          <ul>
+            <li>CORS limitations for some websites</li>
+            <li>Heavy processing on user's device</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Full-Stack (Next.js)</h3>
+      <p>Next.js with API routes for server-side URL fetching and color extraction. More powerful but more complex.</p>
+      <div class="pros-cons">
+        <div class="pros">
+          <h4>Pros</h4>
+          <ul>
+            <li>No CORS issues for URL extraction</li>
+            <li>Server-side processing available</li>
+            <li>Built-in API routes</li>
+            <li>SEO-friendly if needed</li>
+          </ul>
+        </div>
+        <div class="cons">
+          <h4>Cons</h4>
+          <ul>
+            <li>More setup complexity</li>
+            <li>Server costs if traffic grows</li>
+            <li>Overkill for MVP scope</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Hybrid (React + Serverless)</h3>
+      <p>React SPA with a few serverless functions (Vercel/Netlify) for URL fetching only. Best of both worlds.</p>
+      <div class="pros-cons">
+        <div class="pros">
+          <h4>Pros</h4>
+          <ul>
+            <li>Client-side for most work</li>
+            <li>Serverless for CORS bypass</li>
+            <li>Scales automatically</li>
+            <li>Low cost, simple deployment</li>
+          </ul>
+        </div>
+        <div class="cons">
+          <h4>Cons</h4>
+          <ul>
+            <li>Two deployment targets</li>
+            <li>Slight added complexity</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 2rem; padding: 1rem; background: var(--bg-secondary); border-radius: 8px;">
+  <p><strong>My recommendation:</strong> Option A (SPA) to start. We can add serverless functions for URL fetching if CORS becomes a blocker — the architecture supports this evolution without major refactoring.</p>
+</div>
