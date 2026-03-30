@@ -3,6 +3,7 @@ import { useApp } from '../../context/AppContext'
 import { ExtractView } from '../extract/ExtractView'
 import { PaletteView } from '../palette/PaletteView'
 import { TemplateView } from '../templates/TemplateView'
+import { ExportView } from '../export/ExportView'
 
 export function Canvas() {
   const { state } = useApp()
@@ -12,7 +13,7 @@ export function Canvas() {
       {state.view === 'extract' && <ExtractView />}
       {state.view === 'palette' && <PaletteView />}
       {state.view === 'template' && <TemplateView />}
-      {state.view === 'export' && <div className="text-neutral-500">Export view — Task 17</div>}
+      {state.view === 'export' && <ExportView />}
     </main>
   )
 }
