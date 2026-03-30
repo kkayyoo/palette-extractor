@@ -25,3 +25,9 @@ it('assignRoles returns colors with unique roles', () => {
   const roles = result.map(c => c.role)
   expect(new Set(roles).size).toBe(roles.length)
 })
+
+it('extractColorsFromCanvas returns empty array for empty pixel data', () => {
+  // kMeans with empty array should return empty, not crash
+  const result = kMeans([], 6)
+  expect(result).toHaveLength(0)
+})

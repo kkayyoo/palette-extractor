@@ -19,6 +19,7 @@ export function kMeans(
   k: number,
   maxIter = 20
 ): [number, number, number][] {
+  if (pixels.length === 0) return []
   // Seed centroids from evenly-spaced pixels
   let centroids = Array.from({ length: k }, (_, i) =>
     pixels[Math.floor((i / k) * pixels.length)]
@@ -35,7 +36,7 @@ export function kMeans(
       clusters[best].push(p)
     }
     centroids = clusters.map(cluster => {
-      if (cluster.length === 0) return centroids[0]
+      if (cluster.length === 0) return pixels[Math.floor(Math.random() * pixels.length)]
       const sum = cluster.reduce(
         (acc, p) => [acc[0]+p[0], acc[1]+p[1], acc[2]+p[2]] as [number,number,number],
         [0,0,0] as [number,number,number]
@@ -81,6 +82,8 @@ export function extractColorsFromCanvas(canvas: HTMLCanvasElement, k = 6): Palet
       pixels.push([data[i], data[i + 1], data[i + 2]])
     }
   }
-  const centroids = kMeans(pixels, k)
+  if (pixels.length === 0) return []
+  const actualK = Math.min(k, pixels.length)
+  const centroids = kMeans(pixels, actualK)
   return assignRoles(centroids.map(rgbToHex))
 }
