@@ -22,7 +22,7 @@ export function useAIAnalysis() {
       setResult(res)
       return res
     } catch (e) {
-      setError((e as Error).message)
+      setError(e instanceof Error ? e.message : String(e))
       return null
     } finally {
       setIsLoading(false)

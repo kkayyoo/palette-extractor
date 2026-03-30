@@ -21,8 +21,9 @@ interface Props {
 export function DesignFormatPicker({ suggestions, selected, onChange }: Props) {
   return (
     <div className="flex flex-col gap-2">
-      <label className="text-sm font-medium text-neutral-300">Design Format</label>
+      <label htmlFor="design-format" className="text-sm font-medium text-neutral-300">Design Format</label>
       <select
+        id="design-format"
         value={selected}
         onChange={e => onChange(e.target.value as DesignFormat)}
         className="bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-neutral-100 focus:outline-none focus:border-indigo-500"
