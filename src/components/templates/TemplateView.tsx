@@ -3,21 +3,22 @@ import { useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { TemplateGrid } from './TemplateGrid'
 import { TemplatePreview } from './TemplatePreview'
-import { AnimationControls } from './AnimationControls'
+import { AnimationControls, ANIMATION_STYLES_BY_CATEGORY } from './AnimationControls'
 import { ALL_TEMPLATES, CATEGORIES } from '../../templates'
+import type { TemplateCategory } from '../../templates'
 import type { TemplateSpec } from '../../templates/types'
 import type { CustomizationOptions } from '../../templates/types'
 import type { Project } from '../../types'
 
 const DEFAULT_OPTIONS: CustomizationOptions = {
-  animationStyle: 'hover-scale',
+  animationStyle: ANIMATION_STYLES_BY_CATEGORY['button'][0], // 'hover-scale'
   animationSpeed: 'default',
   animationIntensity: 'medium',
 }
 
 export function TemplateView() {
   const { state, addProject, setActiveProject } = useApp()
-  const [activeCategory, setActiveCategory] = useState<string>('button')
+  const [activeCategory, setActiveCategory] = useState<TemplateCategory>('button')
   const [selected, setSelected] = useState<TemplateSpec | null>(null)
   const [options, setOptions] = useState<CustomizationOptions>(DEFAULT_OPTIONS)
 
@@ -32,8 +33,8 @@ export function TemplateView() {
   const preview = selected ? selected.generate(colors, designFormat, options) : null
 
   function handleSave() {
-    if (!selected || !activePaletteProject?.palette) return
-    const { html, css } = selected.generate(colors, designFormat, options)
+    if (!selected || !preview || !activePaletteProject?.palette) return
+    const { html, css } = preview
     const project: Project = {
       id: crypto.randomUUID(),
       name: `${selected.label} — ${new Date().toLocaleDateString()}`,
@@ -42,7 +43,7 @@ export function TemplateView() {
         category: activeCategory,
         templateId: selected.id,
         appliedPalette: activePaletteProject.id,
-        customizations: options as unknown as Record<string, unknown>,
+        customizations: options,
         generatedCode: `<style>\n${css}\n</style>\n\n${html}`,
       },
       createdAt: Date.now(),
@@ -65,7 +66,12 @@ export function TemplateView() {
         {CATEGORIES.map(cat => (
           <button
             key={cat}
-            onClick={() => { setActiveCategory(cat); setSelected(null) }}
+            onClick={() => {
+              const firstStyle = ANIMATION_STYLES_BY_CATEGORY[cat]?.[0] ?? 'hover-scale'
+              setActiveCategory(cat)
+              setSelected(null)
+              setOptions(prev => ({ ...prev, animationStyle: firstStyle }))
+            }}
             className={`px-3 py-1.5 rounded text-sm font-medium ${
               activeCategory === cat ? 'bg-indigo-600 text-white' : 'text-neutral-400 hover:text-white'
             }`}

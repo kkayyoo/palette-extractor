@@ -1,7 +1,7 @@
 // src/components/templates/AnimationControls.tsx
 import type { CustomizationOptions, AnimationSpeed, AnimationIntensity } from '../../templates/types'
 
-const ANIMATION_STYLES_BY_CATEGORY: Record<string, string[]> = {
+export const ANIMATION_STYLES_BY_CATEGORY: Record<string, string[]> = {
   button: ['hover-scale', 'ripple', 'glow-pulse', 'slide-fill', 'bounce'],
   card: ['hover-lift', 'tilt', 'border-glow', 'content-reveal', 'flip'],
   hero: ['text-fade-in', 'parallax', 'floating', 'typewriter', 'staggered'],

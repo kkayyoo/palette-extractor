@@ -1,5 +1,14 @@
 // src/types/index.ts
 
+export type AnimationSpeed = 'slow' | 'default' | 'fast'
+export type AnimationIntensity = 'subtle' | 'medium' | 'dramatic'
+
+export interface CustomizationOptions {
+  animationStyle: string
+  animationSpeed: AnimationSpeed
+  animationIntensity: AnimationIntensity
+}
+
 export type DesignFormat =
   | 'minimalist' | 'brutalist' | 'flat' | 'glassmorphism'
   | 'neumorphism' | 'retro' | 'organic' | 'skeuomorphic';
@@ -46,7 +55,7 @@ export interface TemplateRecord {
   category: string;
   templateId: string;
   appliedPalette: string; // palette id
-  customizations: Record<string, unknown>;
+  customizations: CustomizationOptions;
   generatedCode: string;
 }
 

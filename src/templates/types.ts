@@ -1,14 +1,7 @@
 // src/templates/types.ts
-import type { DesignFormat, PaletteColor } from '../types'
+import type { DesignFormat, PaletteColor, CustomizationOptions } from '../types'
 
-export type AnimationSpeed = 'slow' | 'default' | 'fast'
-export type AnimationIntensity = 'subtle' | 'medium' | 'dramatic'
-
-export interface CustomizationOptions {
-  animationStyle: string
-  animationSpeed: AnimationSpeed
-  animationIntensity: AnimationIntensity
-}
+export type { AnimationSpeed, AnimationIntensity, CustomizationOptions } from '../types'
 
 export interface TemplateResult {
   html: string
