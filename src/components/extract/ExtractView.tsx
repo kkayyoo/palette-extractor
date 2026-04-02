@@ -6,7 +6,14 @@ import { DesignFormatPicker } from './DesignFormatPicker'
 import { useColorExtraction } from '../../hooks/useColorExtraction'
 import { useAIAnalysis } from '../../hooks/useAIAnalysis'
 import { useApp } from '../../context/AppContext'
-import type { ContentFormat, DesignFormat, ExtractedPalette, HexColor, PaletteColor } from '../../types'
+import type { ContentFormat, DesignFormat, ExtractedPalette, HexColor, PaletteColor, SuggestedStyles } from '../../types'
+
+const DEFAULT_SUGGESTED_FORMATS: [DesignFormat, DesignFormat] = ['minimalist', 'flat']
+const DEFAULT_SUGGESTED_STYLES: SuggestedStyles = {
+  borderRadius: 'rounded',
+  shadows: 'subtle',
+  typography: 'modern',
+}
 
 const CONTENT_FORMATS: ContentFormat[] = [
   'website', 'mobile-app', 'dashboard', 'landing-page',
@@ -26,9 +33,8 @@ export function ExtractView() {
   const [urlError, setUrlError] = useState<string | null>(null)
 
   async function handleFileSelected(file: File) {
-    // extractFromFile returns the colors directly to avoid reading stale React state
     const extracted = await extraction.extractFromFile(file)
-    if (extracted && extracted.length > 0) {
+    if (extracted && extracted.length > 0 && apiKey.trim()) {
       const hexColors = extracted.map(c => c.hex)
       const analysisResult = await ai.analyze(hexColors, null, apiKey)
       if (analysisResult) setSelectedFormat(analysisResult.suggestedDesignFormats[0])
@@ -42,15 +48,15 @@ export function ExtractView() {
       const res = await fetch(`/api/fetch-url?url=${encodeURIComponent(url)}`)
       if (!res.ok) { const d = await res.json(); throw new Error(d.error) }
       const data = await res.json()
-      // data.colors is string[] of hex from CSS; convert to PaletteColor[]
       const hexColors: string[] = data.colors.slice(0, 8)
       const paletteColors: PaletteColor[] = hexColors
         .filter((h): h is HexColor => /^#[0-9a-fA-F]{3,8}$/.test(h))
         .map((hex, i) => ({ hex, role: i === 0 ? 'primary' : i === 1 ? 'secondary' : 'accent' as const }))
       setUrlColors(paletteColors)
-      // Capture return value directly to avoid stale state reads
-      const analysisResult = await ai.analyze(hexColors, null, apiKey)
-      if (analysisResult) setSelectedFormat(analysisResult.suggestedDesignFormats[0])
+      if (apiKey.trim()) {
+        const analysisResult = await ai.analyze(hexColors, null, apiKey)
+        if (analysisResult) setSelectedFormat(analysisResult.suggestedDesignFormats[0])
+      }
     } catch (e) {
       setUrlError(e instanceof Error ? e.message : String(e))
     } finally {
@@ -60,16 +66,17 @@ export function ExtractView() {
 
   function handleSave() {
     const colors = tab === 'image' ? extraction.colors : urlColors
-    if (!ai.result || colors.length === 0) return
+    if (colors.length === 0) return
+    // Use AI results if available, otherwise fall back to sensible defaults
     const palette: ExtractedPalette = {
       id: crypto.randomUUID(),
       name: `Palette ${new Date().toLocaleDateString()}`,
       source: { type: tab, thumbnail: tab === 'image' ? extraction.thumbnail : '' },
       colors,
-      keywords: ai.result.keywords,
-      mood: ai.result.mood,
-      suggestedDesignFormats: ai.result.suggestedDesignFormats,
-      suggestedStyles: ai.result.suggestedStyles,
+      keywords: ai.result?.keywords ?? colors.map(c => c.role),
+      mood: ai.result?.mood ?? 'neutral',
+      suggestedDesignFormats: ai.result?.suggestedDesignFormats ?? DEFAULT_SUGGESTED_FORMATS,
+      suggestedStyles: ai.result?.suggestedStyles ?? DEFAULT_SUGGESTED_STYLES,
       designFormat: selectedFormat,
       contentFormat,
       createdAt: Date.now(),
@@ -94,19 +101,19 @@ export function ExtractView() {
     <div className="max-w-2xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">Extract Colors</h1>
 
-      {/* API Key input */}
+      {/* API Key input — optional */}
       <div className="mb-6">
-        <label className="block text-sm font-medium text-neutral-400 mb-1">OpenAI API Key</label>
+        <label className="block text-sm font-medium text-neutral-400 mb-1">
+          OpenAI API Key <span className="text-neutral-600 font-normal">(optional — enables AI mood & keyword analysis)</span>
+        </label>
         <input
           type="password"
           value={apiKey}
           onChange={e => {
             setApiKey(e.target.value)
-            // Note: stored in localStorage for persistence across sessions.
-            // Users should use a key with minimal permissions and understand the trade-off.
             localStorage.setItem('openai-api-key', e.target.value)
           }}
-          placeholder="sk-..."
+          placeholder="sk-… (leave blank to skip AI analysis)"
           className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-neutral-100 text-sm focus:outline-none focus:border-indigo-500"
         />
       </div>
@@ -134,11 +141,11 @@ export function ExtractView() {
         <UrlInput onSubmit={handleUrlSubmit} isLoading={isUrlLoading} error={urlError} />
       )}
 
-      {/* AI loading */}
+      {/* AI loading / error */}
       {ai.isLoading && <p className="mt-4 text-indigo-400 animate-pulse">Analyzing with AI…</p>}
       {ai.error && <p className="mt-4 text-red-400 text-sm">{ai.error}</p>}
 
-      {/* Results */}
+      {/* Results — shown as soon as colors are extracted, regardless of AI */}
       {hasPalette && (
         <div className="mt-6 space-y-4">
           {/* Color swatches */}
@@ -152,44 +159,43 @@ export function ExtractView() {
             ))}
           </div>
 
-          {/* AI results */}
+          {/* AI results (shown only when available) */}
           {ai.result && (
-            <>
-              <div className="flex gap-2 flex-wrap">
-                {ai.result.keywords.map(k => (
-                  <span key={k} className="bg-neutral-800 text-neutral-300 rounded-full px-3 py-0.5 text-xs">{k}</span>
-                ))}
-                <span className="bg-indigo-900 text-indigo-300 rounded-full px-3 py-0.5 text-xs">mood: {ai.result.mood}</span>
-              </div>
-
-              <DesignFormatPicker
-                suggestions={ai.result.suggestedDesignFormats}
-                selected={selectedFormat}
-                onChange={setSelectedFormat}
-              />
-
-              <div className="flex flex-col gap-1">
-                <label htmlFor="content-format" className="text-sm font-medium text-neutral-300">Content Format</label>
-                <select
-                  id="content-format"
-                  value={contentFormat}
-                  onChange={e => setContentFormat(e.target.value as ContentFormat)}
-                  className="bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-neutral-100 focus:outline-none focus:border-indigo-500"
-                >
-                  {CONTENT_FORMATS.map(f => (
-                    <option key={f} value={f}>{f}</option>
-                  ))}
-                </select>
-              </div>
-
-              <button
-                onClick={handleSave}
-                className="w-full bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg py-3 font-semibold"
-              >
-                Save Palette →
-              </button>
-            </>
+            <div className="flex gap-2 flex-wrap">
+              {ai.result.keywords.map(k => (
+                <span key={k} className="bg-neutral-800 text-neutral-300 rounded-full px-3 py-0.5 text-xs">{k}</span>
+              ))}
+              <span className="bg-indigo-900 text-indigo-300 rounded-full px-3 py-0.5 text-xs">mood: {ai.result.mood}</span>
+            </div>
           )}
+
+          {/* Design format picker — uses AI suggestions when available, defaults otherwise */}
+          <DesignFormatPicker
+            suggestions={ai.result?.suggestedDesignFormats ?? DEFAULT_SUGGESTED_FORMATS}
+            selected={selectedFormat}
+            onChange={setSelectedFormat}
+          />
+
+          <div className="flex flex-col gap-1">
+            <label htmlFor="content-format" className="text-sm font-medium text-neutral-300">Content Format</label>
+            <select
+              id="content-format"
+              value={contentFormat}
+              onChange={e => setContentFormat(e.target.value as ContentFormat)}
+              className="bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-neutral-100 focus:outline-none focus:border-indigo-500"
+            >
+              {CONTENT_FORMATS.map(f => (
+                <option key={f} value={f}>{f}</option>
+              ))}
+            </select>
+          </div>
+
+          <button
+            onClick={handleSave}
+            className="w-full bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg py-3 font-semibold"
+          >
+            Save Palette →
+          </button>
         </div>
       )}
     </div>
